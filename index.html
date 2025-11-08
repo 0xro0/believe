@@ -89,6 +89,7 @@
       margin-top: 24px;
       position: relative;
       height: 56px;
+      overflow: hidden;
     }
 
     .submit-btn {
@@ -110,6 +111,7 @@
       justify-content: center;
       text-transform: uppercase;
       letter-spacing: 0.06em;
+      touch-action: none;
     }
 
     .submit-btn:hover {
@@ -182,21 +184,30 @@
       btn.style.transform = `translate(${newX}px, ${newY}px)`;
     }
 
-    const isCoarsePointer =
+    const isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    const isSmallScreen =
       window.matchMedia &&
-      window.matchMedia("(pointer: coarse)").matches;
+      window.matchMedia("(max-width: 768px)").matches;
+    const isMobile = isTouchDevice || isSmallScreen;
 
-    if (isCoarsePointer) {
-      // Mobile / touch: constantly moving, cannot effectively click
-      moveButton(); // start in a random spot
-      setInterval(moveButton, 500);
+    if (isMobile) {
+      // Mobile: constantly moving, impossible to tap
+      moveButton();
+      setInterval(moveButton, 400);
 
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        moveButton();
+      ["touchstart", "touchend", "click"].forEach(evt => {
+        btn.addEventListener(
+          evt,
+          e => {
+            e.preventDefault();
+            moveButton();
+          },
+          { passive: false }
+        );
       });
     } else {
-      // Desktop / mouse: original runaway behavior
+      // Desktop: original runaway behavior
       btn.addEventListener("mouseenter", moveButton);
       btn.addEventListener("click", function (e) {
         e.preventDefault();
