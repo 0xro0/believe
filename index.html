@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #050505;
-      --card: #000000;
+      --bg: #000000;
+      --card: #050505;
       --accent: #3bff14;
       --accent-hover: #2ad30b;
       --text-main: #ffffff;
@@ -29,27 +29,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 24px;
     }
 
     .page {
       width: 100%;
-      max-width: 520px;
+      max-width: 640px;
       text-align: center;
     }
 
     .title {
-      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-size: clamp(1.9rem, 3vw, 2.6rem);
       font-weight: 700;
       margin-bottom: 24px;
     }
 
     .card {
       background: var(--card);
-      border-radius: 18px;
-      padding: 24px 18px 32px;
-      border: 1px solid #1a1a1a;
-      box-shadow: 0 0 0 1px #050505;
+      border-radius: 20px;
+      padding: 28px 24px 32px;
+      border: 1px solid #151515;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
     }
 
     .tagline {
@@ -57,19 +57,20 @@
       color: var(--text-muted);
       margin-bottom: 16px;
       line-height: 1.4;
+      text-align: left;
     }
 
     .feedback-label {
       text-align: left;
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       margin-bottom: 8px;
       color: var(--text-muted);
     }
 
     textarea {
       width: 100%;
-      min-height: 160px;
-      background: #050505;
+      min-height: 150px;
+      background: #000000;
       border-radius: 12px;
       border: 1px solid #262626;
       color: var(--text-main);
@@ -126,15 +127,19 @@
     }
 
     .footer {
-      margin-top: 24px;
+      margin-top: 18px;
       font-size: 0.7rem;
       color: var(--text-muted);
       opacity: 0.8;
     }
 
     @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+
       .card {
-        padding: 20px 14px 26px;
+        padding: 22px 16px 26px;
       }
 
       .submit-btn {
@@ -143,16 +148,16 @@
       }
     }
 
-    /* Mobile: always moving across the submit-area and impossible to tap */
+    /* Mobile (small screens): button is always moving and untappable */
     @media (max-width: 768px) {
       .submit-btn {
-        animation: driftAround 1.4s infinite linear;
+        animation: driftAround 1.3s infinite linear;
         pointer-events: none;
       }
 
       @keyframes driftAround {
         0% {
-          transform: translate(-120%, -10px);
+          transform: translate(-120%, -8px);
         }
         25% {
           transform: translate(0%, 10px);
@@ -201,7 +206,7 @@
     const isSmallScreen =
       window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
 
-    // Desktop with mouse: only moves when user actually tries to click it
+    // Desktop: normal at first, then runs away once they try to click
     if (!isSmallScreen) {
       function moveButton() {
         const areaRect = submitArea.getBoundingClientRect();
@@ -254,7 +259,7 @@
         }
       });
     }
-    // Mobile: handled purely by CSS animation, click is disabled via pointer-events:none
+    // Mobile motion handled by CSS animation
   </script>
 </body>
 </html>
