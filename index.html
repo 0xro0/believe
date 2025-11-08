@@ -142,6 +142,32 @@
         height: 32px;
       }
     }
+
+    /* Mobile: always moving across the submit-area and impossible to tap */
+    @media (max-width: 768px) {
+      .submit-btn {
+        animation: driftAround 1.4s infinite linear;
+        pointer-events: none;
+      }
+
+      @keyframes driftAround {
+        0% {
+          transform: translate(-120%, -10px);
+        }
+        25% {
+          transform: translate(0%, 10px);
+        }
+        50% {
+          transform: translate(120%, -6px);
+        }
+        75% {
+          transform: translate(0%, -4px);
+        }
+        100% {
+          transform: translate(-120%, 6px);
+        }
+      }
+    }
   </style>
 </head>
 <body>
@@ -172,49 +198,51 @@
   <script>
     const btn = document.getElementById("runawayBtn");
     const submitArea = document.querySelector(".submit-area");
-
-    function moveButton() {
-      const areaRect = submitArea.getBoundingClientRect();
-      const maxX = areaRect.width - btn.offsetWidth;
-      const maxY = areaRect.height - btn.offsetHeight;
-
-      const newX = Math.random() * maxX - maxX / 2;
-      const newY = Math.random() * maxY - maxY / 2;
-
-      btn.style.transform = `translate(${newX}px, ${newY}px)`;
-    }
-
-    const isTouchDevice =
-      "ontouchstart" in window || navigator.maxTouchPoints > 0;
     const isSmallScreen =
-      window.matchMedia &&
-      window.matchMedia("(max-width: 768px)").matches;
-    const isMobile = isTouchDevice || isSmallScreen;
+      window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
 
-    if (isMobile) {
-      // Mobile: constantly moving, impossible to tap
-      moveButton();
-      setInterval(moveButton, 400);
+    // Desktop with mouse: only moves when user actually tries to click it
+    if (!isSmallScreen) {
+      function moveButton() {
+        const areaRect = submitArea.getBoundingClientRect();
+        const maxX = areaRect.width - btn.offsetWidth;
+        const maxY = areaRect.height - btn.offsetHeight;
 
-      ["touchstart", "touchend", "click"].forEach(evt => {
-        btn.addEventListener(
-          evt,
-          e => {
-            e.preventDefault();
-            moveButton();
-          },
-          { passive: false }
-        );
+        const newX = Math.random() * maxX - maxX / 2;
+        const newY = Math.random() * maxY - maxY / 2;
+
+        btn.style.transform = `translate(${newX}px, ${newY}px)`;
+      }
+
+      let trollMode = false;
+
+      function startTroll() {
+        if (!trollMode) {
+          trollMode = true;
+          moveButton();
+        }
+      }
+
+      btn.addEventListener("mouseenter", () => {
+        startTroll();
+        moveButton();
       });
-    } else {
-      // Desktop: original runaway behavior
-      btn.addEventListener("mouseenter", moveButton);
-      btn.addEventListener("click", function (e) {
+
+      btn.addEventListener("mousedown", e => {
+        startTroll();
+        e.preventDefault();
+        moveButton();
+      });
+
+      btn.addEventListener("click", e => {
+        startTroll();
         e.preventDefault();
         moveButton();
       });
 
       submitArea.addEventListener("mousemove", function (e) {
+        if (!trollMode) return;
+
         const rect = btn.getBoundingClientRect();
         const radius = 65;
         const distX = e.clientX - (rect.left + rect.width / 2);
@@ -226,6 +254,7 @@
         }
       });
     }
+    // Mobile: handled purely by CSS animation, click is disabled via pointer-events:none
   </script>
 </body>
-</html>
+</html> 
