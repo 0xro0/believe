@@ -182,23 +182,39 @@
       btn.style.transform = `translate(${newX}px, ${newY}px)`;
     }
 
-    btn.addEventListener("mouseenter", moveButton);
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      moveButton();
-    });
+    const isCoarsePointer =
+      window.matchMedia &&
+      window.matchMedia("(pointer: coarse)").matches;
 
-    submitArea.addEventListener("mousemove", function (e) {
-      const rect = btn.getBoundingClientRect();
-      const radius = 65;
-      const distX = e.clientX - (rect.left + rect.width / 2);
-      const distY = e.clientY - (rect.top + rect.height / 2);
-      const distance = Math.hypot(distX, distY);
+    if (isCoarsePointer) {
+      // Mobile / touch: constantly moving, cannot effectively click
+      moveButton(); // start in a random spot
+      setInterval(moveButton, 500);
 
-      if (distance < radius) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
         moveButton();
-      }
-    });
+      });
+    } else {
+      // Desktop / mouse: original runaway behavior
+      btn.addEventListener("mouseenter", moveButton);
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        moveButton();
+      });
+
+      submitArea.addEventListener("mousemove", function (e) {
+        const rect = btn.getBoundingClientRect();
+        const radius = 65;
+        const distX = e.clientX - (rect.left + rect.width / 2);
+        const distY = e.clientY - (rect.top + rect.height / 2);
+        const distance = Math.hypot(distX, distY);
+
+        if (distance < radius) {
+          moveButton();
+        }
+      });
+    }
   </script>
 </body>
-</html> 
+</html>
